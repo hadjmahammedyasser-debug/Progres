@@ -1,27 +1,26 @@
-name: Progres auto meal booking
+name: Build APK
 
 on:
-  schedule:
-    # 19:00 UTC = 20:00 بتوقيت الجزائر (UTC+1)، قبل إغلاق الحجز منتصف الليل بوقت كاف
-    - cron: "0 19 * * *"
+  push:
+    branches: [main]
   workflow_dispatch: # تشغيل يدوي من تبويب Actions
 
 jobs:
-  book:
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Build with Buildozer
+        id: buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
         with:
-          python-version: "3.12"
-          cache: pip
+          command: buildozer android debug
+          buildozer_version: stable
 
-      - run: pip install -r requirements.txt
-
-      - name: Book meals
-        env:
-          PROGRES_USERNAME: ${{ secrets.PROGRES_USERNAME }}
-          PROGRES_PASSWORD: ${{ secrets.PROGRES_PASSWORD }}
-        run: python progres_auto_booking.py
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: progres-repas-apk
+          path: bin/*.apk
