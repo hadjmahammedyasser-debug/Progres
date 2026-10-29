@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 try:
     import requests
 except ImportError:
-    sys.exit("ثبّت المكتبة أولا:  pip install -r requirements.txt")
+    sys.exit("Installez d'abord : pip install -r requirements.txt")
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_CONFIG = os.path.join(HERE, "config.json")
@@ -93,8 +93,8 @@ class Progres:
         ep = self.cfg["endpoints"][name]
         if "TODO" in json.dumps(ep):
             sys.exit(
-                f"المسار '{name}' في config.json لم يُملأ بعد (TODO).\n"
-                "اتبع خطوات README.md لاستخراجه من المتصفح (--har)."
+                f"Le chemin '{name}' de config.json est encore à TODO.\n"
+                "Suivez le README.md pour l'extraire du navigateur (--har)."
             )
         ctx = {**self.ctx, **(extra or {})}
         kwargs = {"timeout": 30}
@@ -113,7 +113,7 @@ class Progres:
         data = r.json()
         token = data.get("token")
         if not token:
-            raise RuntimeError("لم يُرجع الخادم token — تحقق من اسم المستخدم وكلمة السر")
+            raise RuntimeError("Pas de token reçu : vérifiez l'identifiant et le mot de passe")
         self.ctx["token"] = token
         for k, v in data.items():  # uuid, userId, id ... متاحة كـ {uuid} في القوالب
             if isinstance(v, (str, int)):
@@ -121,7 +121,7 @@ class Progres:
         self.s.headers["Authorization"] = fill(
             self.cfg.get("auth_header_format", "{token}"), self.ctx
         )
-        log.info("تم تسجيل الدخول")
+        log.info("Connexion réussie")
 
     def book(self, day, meal):
         fmt = self.cfg.get("date_format", "%Y-%m-%d")
@@ -138,30 +138,30 @@ def run_once(cfg, dry_run=False):
     dates = target_dates(cfg)
     meals = cfg.get("meals", [])
     if not dates or not meals:
-        log.info("لا شيء للحجز (تحقق من weekdays / meals)")
+        log.info("Rien à réserver (vérifiez weekdays / meals)")
         return
     plan = [(d, m) for d in dates for m in meals]
     if dry_run:
         for d, m in plan:
-            print(f"[DRY] سيتم حجز: {d} ({d.strftime('%A')}) — {m}")
+            print(f"[DRY] Réservera : {d} ({d.strftime('%A')}) - {m}")
         return
     client = Progres(cfg)
     client.login()
     done = sum(client.book(d, m) for d, m in plan)
-    log.info("اكتمل: %d/%d", done, len(plan))
+    log.info("Terminé : %d/%d", done, len(plan))
 
 
 def daemon(cfg):
     run_at = cfg.get("run_at", "20:00")
-    log.info("وضع الخدمة: التنفيذ يوميا عند %s", run_at)
+    log.info("Mode service : exécution quotidienne à %s", run_at)
     while True:
         wait = seconds_until(run_at)
-        log.info("الانتظار %.0f دقيقة", wait / 60)
+        log.info("Attente : %.0f min", wait / 60)
         time.sleep(wait)
         try:
             run_once(cfg)
         except Exception as e:  # لا نوقف الخدمة بسبب خطأ عابر
-            log.error("فشل التنفيذ: %s", e)
+            log.error("Échec : %s", e)
 
 
 def discover_har(path):
@@ -184,7 +184,7 @@ def discover_har(path):
             if body and "password" not in body.lower():
                 print(f"    body: {body[:300]}")
     if not found:
-        print("لم أجد طلبات مرشحة. سجّل عملية حجز كاملة ثم صدّر HAR.")
+        print("Aucune requête candidate. Enregistrez une réservation complète puis exportez le HAR.")
 
 
 # -------------------------------------------------------------------- main

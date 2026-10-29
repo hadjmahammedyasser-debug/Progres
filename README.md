@@ -3,7 +3,7 @@
 أداة بايثون تحجز وجباتك الجامعية تلقائيا كل يوم، قبل إغلاق الحجز منتصف الليل (الحد الأقصى 3 أيام مسبقا حسب بلاغ الديوان).
 
 **كل الملفات في مجلد واحد:**
-`progres_auto_booking.py` · `config.json` · `requirements.txt` · `README.md`
+`progres_auto_booking.py` · `main.py` · `buildozer.spec` · `config.json` · `requirements.txt` · `README.md`
 
 ## ⚠️ مهم قبل البدء
 - مسار تسجيل الدخول (`/api/authentication/v1/`) مأخوذ من معرفتي بالمنصة وقد يختلف.
@@ -58,3 +58,16 @@ python progres_auto_booking.py --daemon    # خدمة يومية عند run_at (
 | `days_ahead` | عدد الأيام القادمة (أقصاه 3) |
 | `run_at` | وقت التنفيذ اليومي في وضع `--daemon` |
 | `auth_header_format` | شكل ترويسة Authorization (`{token}` أو `Bearer {token}`) |
+
+## 5) تطبيق أندرويد (APK) عبر GitHub Actions
+الملفات: `main.py` (الواجهة) + `buildozer.spec` + `.github/workflows/build-apk.yml`.
+1. أكمل `config.json` (مسار الحجز `endpoints.book` وقيم `meals`) — تُدمج داخل التطبيق.
+2. ارفع المشروع إلى مستودع **خاص** على فرع `main`.
+3. تبويب **Actions** ← **Build APK** ← Run workflow (أو يعمل تلقائيا عند كل push). البناء الأول 20–40 دقيقة.
+4. حمّل الملف من **Artifacts** (`progres-repas-apk`) وفك الزيب، ثم ثبّت `.apk` على هاتفك (اسمح بالتثبيت من مصادر غير معروفة).
+5. في التطبيق: أدخل المعرّف وكلمة السر (تُحفظ على الهاتف فقط) ← **Enregistrer** ← **Réserver maintenant**.
+
+ملاحظات:
+- واجهة التطبيق بالفرنسية لأن Kivy لا يدعم الخط العربي افتراضيا.
+- الحجز التلقائي يتم **عند فتح التطبيق** (مفتاح *Réserver auto à l'ouverture*) مرة يوميا؛ لا يعمل في الخلفية.
+- ملف `.github/workflows/booking.yml` اختياري (حجز مجدول من خوادم GitHub) — احذفه إن لم ترده.
