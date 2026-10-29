@@ -1,0 +1,28 @@
+{
+  "_comment": "عدّل القيم ثم احذف أي مفتاح يبدأ بـ _ إن أردت. كلمة السر الأفضل وضعها في متغير البيئة PROGRES_PASSWORD",
+
+  "username": "رقم_التسجيل_او_اسم_المستخدم",
+  "password": "",
+
+  "base_url": "https://progres.mesrs.dz",
+  "auth_header_format": "{token}",
+
+  "meals": ["TODO_meal_value_1", "TODO_meal_value_2"],
+  "weekdays": ["sun", "mon", "tue", "wed", "thu"],
+  "days_ahead": 3,
+  "date_format": "%Y-%m-%d",
+  "run_at": "20:00",
+
+  "endpoints": {
+    "login": {
+      "method": "POST",
+      "path": "/api/authentication/v1/",
+      "body": { "username": "{username}", "password": "{password}" }
+    },
+    "book": {
+      "method": "POST",
+      "path": "TODO",
+      "body": { "date": "{date}", "repas": "{meal}", "TODO": "انسخ شكل الجسم من HAR" }
+    }
+  }
+}
