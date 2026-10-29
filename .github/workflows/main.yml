@@ -1,0 +1,27 @@
+name: Progres auto meal booking
+
+on:
+  schedule:
+    # 19:00 UTC = 20:00 بتوقيت الجزائر (UTC+1)، قبل إغلاق الحجز منتصف الليل بوقت كاف
+    - cron: "0 19 * * *"
+  workflow_dispatch: # تشغيل يدوي من تبويب Actions
+
+jobs:
+  book:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Book meals
+        env:
+          PROGRES_USERNAME: ${{ secrets.PROGRES_USERNAME }}
+          PROGRES_PASSWORD: ${{ secrets.PROGRES_PASSWORD }}
+        run: python progres_auto_booking.py
